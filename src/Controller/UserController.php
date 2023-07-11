@@ -12,15 +12,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class UserController extends AbstractController
 {
+
     private $jwtManager;
 
     public function __construct(JWTTokenManagerInterface $jwtManager)
     {
         $this->jwtManager = $jwtManager;
+    }
+
+    #[Route('/user', name: 'user_byId', methods: ['GET'])]
+    public function index(Request $request, UserRepository $userRepository): JsonResponse
+    {
+        $authorizationHeader = $request->headers->get('Authorization');
+
+        $emailValidationResult = $this->validateEmailToken($authorizationHeader);
+
+        return $this->json([
+            'data' => $userRepository->findOneBy(['email' => $emailValidationResult['email']])
+        ], 200, [], ['groups' => 'user_show']);
     }
 
     #[Route('/register', name: 'user_register', methods: ['POST'])]
@@ -51,7 +63,7 @@ class UserController extends AbstractController
         return $this->json([
             'message' => 'user created success!',
             'data' =>  $user,
-        ]);
+        ], 201, [],  ['groups' => 'user_show']);
     }
 
     #[Route('user/{id}', name: 'user_update', methods: ['PUT', 'PATCH'])]
@@ -63,6 +75,8 @@ class UserController extends AbstractController
             $data = $request->request->all();
         }
 
+        $authorizationHeader = $request->headers->get('Authorization');
+
 
         $user = $userRepository->find($id);
 
@@ -71,6 +85,15 @@ class UserController extends AbstractController
                 'message' => 'user not found!',
             ], 404);
         }
+
+        $emailValidationResult = $this->validateEmailToken($authorizationHeader, $user);
+
+        if (!$emailValidationResult['valid']) {
+            return $this->json([
+                'message' => 'user not found!',
+            ], 404);
+        }
+
 
         if (array_key_exists('username', $data)) $user->setNickName($data['username']);
         if (array_key_exists('email', $data)) $user->setEmail($data['email']);
@@ -81,15 +104,16 @@ class UserController extends AbstractController
         return $this->json([
             'message' => 'user updated success!',
             'data' =>  $user,
-        ], 200);
+        ], 200, [], ['groups' => 'user_show']);
     }
-
 
     #[Route('user/{id}', name: 'user_delete', methods: ['DELETE'])]
     public function delete($id, Request $request, UserRepository $userRepository): JsonResponse
     {
         $authorizationHeader = $request->headers->get('Authorization');
+
         $user = $userRepository->find($id);
+        $emailValidationResult = $this->validateEmailToken($authorizationHeader, $user);
 
         if (!$user) {
             return $this->json([
@@ -97,21 +121,24 @@ class UserController extends AbstractController
             ], 404);
         }
 
-        if ($authorizationHeader && preg_match('/Bearer\s(\S+)/', $authorizationHeader, $matches)) {
-            $token = $matches[1];
-            $jwtUserToken = new JWTUserToken();
-            $jwtUserToken->setRawToken($token);
-            $decodedToken = $this->jwtManager->decode($jwtUserToken);
-            $email = $decodedToken['username'];
-        }
-
-
-
-        if ($user->getEmail() == $email || 'ROLE_USER' == $user->getRoles()[0]) {
+        if ($emailValidationResult['valid'] || 'ROLE_ADMIN' == $user->getRoles()[0]) {
             $userRepository->remove($user, true);
             return $this->json([], 204);
         } else {
             return $this->json(['message' => 'user not found!'], 409);
         }
+    }
+
+    private function validateEmailToken($authorizationHeader, User $entity = new User()): array
+    {
+        if ($authorizationHeader && preg_match('/Bearer\s(\S+)/', $authorizationHeader, $matches)) {
+            $token = $matches[1];
+            $jwtUserToken = new JWTUserToken();
+            $jwtUserToken->setRawToken($token);
+            $decodedToken = $this->jwtManager->decode($jwtUserToken);
+            $emailToken = $decodedToken['username'];
+        }
+
+        return ['valid' => $entity->getEmail() == $emailToken, 'email' => $emailToken];
     }
 }
