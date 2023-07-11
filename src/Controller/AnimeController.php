@@ -17,7 +17,38 @@ class AnimeController extends AbstractController
     {
         return $this->json([
             'data' => $animeRepository->findAll()
-        ]);
+        ], 200, [], ['groups' => 'anime_show']);
+    }
+
+    #[Route('/anime/{id}', name: 'anime_single', methods: ["GET"])]
+    public function getById($id, AnimeRepository $animeRepository): JsonResponse
+    {
+        $animeExists = $animeRepository->find($id);
+        if (!$animeExists) {
+            return $this->json([
+                'message' => 'anime not found!',
+            ], 404);
+        }
+
+        return $this->json([
+            'data' =>  $animeExists
+        ], 200, [], ['groups' => 'anime_show']);
+    }
+
+
+    #[Route('/anime/search/{anime_id}', name: 'anime_single_animeId', methods: ["GET"])]
+    public function getByAnime_Id($anime_id, AnimeRepository $animeRepository): JsonResponse
+    {
+        $animeExists = $animeRepository->findOneBy(['anime_id' => $anime_id]);
+        if (!$animeExists) {
+            return $this->json([
+                'message' => 'anime not found!',
+            ], 404);
+        }
+
+        return $this->json([
+            'data' =>  $animeExists
+        ], 200, [], ['groups' => 'anime_show']);
     }
 
     #[Route('/anime', name: 'anime_create', methods: ["POST"])]
@@ -48,7 +79,7 @@ class AnimeController extends AbstractController
         return $this->json([
             'message' => 'anime created success!',
             'data' =>  $anime,
-        ], 201, []);
+        ], 201, [], ['groups' => 'anime_show']);
     }
 
     #[Route('/anime/{id}', name: 'anime_update', methods: ["PUT", "PATCH"])]
@@ -76,7 +107,7 @@ class AnimeController extends AbstractController
         return $this->json([
             'message' => 'anime update success!',
             'data' =>  $animeExists,
-        ], 200, []);
+        ], 200, [], ['groups' => 'anime_show']);
     }
 
     #[Route('/anime/{id}', name: 'anime_delete', methods: ["DELETE"])]

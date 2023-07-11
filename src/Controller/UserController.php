@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\User;
+use App\Middleware\MiddlewareEmail;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Lexik\Bundle\JWTAuthenticationBundle\Security\Authentication\Token\JWTUserToken;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +16,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
 
-    private $jwtManager;
+    private $middlewareEmail;
 
-    public function __construct(JWTTokenManagerInterface $jwtManager)
+    public function __construct(MiddlewareEmail $middlewareEmail)
     {
-        $this->jwtManager = $jwtManager;
+        $this->middlewareEmail = $middlewareEmail;
     }
 
     #[Route('/user', name: 'user_byId', methods: ['GET'])]
@@ -28,7 +28,7 @@ class UserController extends AbstractController
     {
         $authorizationHeader = $request->headers->get('Authorization');
 
-        $emailValidationResult = $this->validateEmailToken($authorizationHeader);
+        $emailValidationResult = $this->middlewareEmail->validateEmailToken($authorizationHeader);
 
         return $this->json([
             'data' => $userRepository->findOneBy(['email' => $emailValidationResult['email']])
@@ -86,14 +86,13 @@ class UserController extends AbstractController
             ], 404);
         }
 
-        $emailValidationResult = $this->validateEmailToken($authorizationHeader, $user);
+        $emailValidationResult = $this->middlewareEmail->validateEmailToken($authorizationHeader, $user);
 
         if (!$emailValidationResult['valid']) {
             return $this->json([
                 'message' => 'user not found!',
             ], 404);
         }
-
 
         if (array_key_exists('username', $data)) $user->setNickName($data['username']);
         if (array_key_exists('email', $data)) $user->setEmail($data['email']);
@@ -113,7 +112,7 @@ class UserController extends AbstractController
         $authorizationHeader = $request->headers->get('Authorization');
 
         $user = $userRepository->find($id);
-        $emailValidationResult = $this->validateEmailToken($authorizationHeader, $user);
+        $emailValidationResult = $this->middlewareEmail->validateEmailToken($authorizationHeader, $user);
 
         if (!$user) {
             return $this->json([
@@ -127,18 +126,5 @@ class UserController extends AbstractController
         } else {
             return $this->json(['message' => 'user not found!'], 409);
         }
-    }
-
-    private function validateEmailToken($authorizationHeader, User $entity = new User()): array
-    {
-        if ($authorizationHeader && preg_match('/Bearer\s(\S+)/', $authorizationHeader, $matches)) {
-            $token = $matches[1];
-            $jwtUserToken = new JWTUserToken();
-            $jwtUserToken->setRawToken($token);
-            $decodedToken = $this->jwtManager->decode($jwtUserToken);
-            $emailToken = $decodedToken['username'];
-        }
-
-        return ['valid' => $entity->getEmail() == $emailToken, 'email' => $emailToken];
     }
 }
