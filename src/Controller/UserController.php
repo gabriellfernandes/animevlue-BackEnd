@@ -66,8 +66,8 @@ class UserController extends AbstractController
         ], 201, [],  ['groups' => 'user_show']);
     }
 
-    #[Route('user/{id}', name: 'user_update', methods: ['PUT', 'PATCH'])]
-    public function update($id, Request $request, UserRepository $userRepository, UserPasswordHasherInterface $generatePasswordHash, ManagerRegistry $doctrine): JsonResponse
+    #[Route('/user', name: 'user_update', methods: ['PUT', 'PATCH'])]
+    public function update(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $generatePasswordHash, ManagerRegistry $doctrine): JsonResponse
     {
         if ($request->headers->get("content-type") == "application/json") {
             $data = $request->toArray();
@@ -76,21 +76,12 @@ class UserController extends AbstractController
         }
 
         $authorizationHeader = $request->headers->get('Authorization');
-
-
-        $user = $userRepository->find($id);
+        $emailValidationResult = $this->middlewareEmail->validateEmailToken($authorizationHeader);
+        $user = $userRepository->findOneBy(["email" => $emailValidationResult['email']]);
 
         if (!$user) {
             return $this->json([
-                'message' => 'user not found!',
-            ], 404);
-        }
-
-        $emailValidationResult = $this->middlewareEmail->validateEmailToken($authorizationHeader, $user);
-
-        if (!$emailValidationResult['valid']) {
-            return $this->json([
-                'message' => 'user not found!',
+                'message' => 'user not found!'
             ], 404);
         }
 

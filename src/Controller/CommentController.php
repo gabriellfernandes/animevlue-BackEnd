@@ -30,7 +30,7 @@ class CommentController extends AbstractController
         ], 200, [], ['groups' => 'comment_show']);
     }
 
-    #[Route('/comments/{id}', name: 'comments_list', methods: ['GET'])]
+    #[Route('/comments/{id}', name: 'comments_single', methods: ['GET'])]
     public function getById($id, CommentRepository $commentRepository): JsonResponse
     {
 
