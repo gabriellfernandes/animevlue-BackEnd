@@ -46,10 +46,10 @@ DATABASE_URL="mysql://usuario:senha@127.0.0.1:3306/animevlue_api?serverVersion=1
 
 ```
 
-2.2.6 - Para rodar projeto utilize o comando `php artisan serve` no terminal, caso de tudo certo receberá uma mensagem parecida com essa:
+2.2.6 - Para rodar projeto utilize o comando `symfony console server:start` ou caso não tenha o CLI do symfony use o comando `php bin/console server:start` no terminal, caso de tudo certo receberá uma mensagem parecida com essa:
 
 ```
-INFO  Server running on [http://127.0.0.1:8000].
+INFO  Server running on http://localhost:8000
 Press Ctrl+C to stop the server
 ```
 
@@ -59,14 +59,10 @@ Press Ctrl+C to stop the server
 3.1 Todas as rotas tem que estar authenticado
 - <a name="insomina" href="https://drive.google.com/file/d/1Sv83ktRRqDbtTldyXm03xGAvItkVIVQE/view?usp=sharing" target="_blank">Arquivo de importação para o Insomnia</a>
 
-3.2 Rota para pegar todos os eletrodomésticos `metodo:get Rota:localhost:8000/api/appliances` 
-
-retorno:
-
 <a name="frontend"></a>
 
 ## 4. Front-End
-- <a name="Repositorio Back-End" href="https://github.com/gabriellfernandes/Elec-Shop-frontend" target="_blank">Repositorio Front-End</a>
+- <a name="Repositorio Front-End" href="https://github.com/gabriellfernandes/" target="_blank">Repositorio Front-End</a>
 
 <a name="devs"></a>
 
