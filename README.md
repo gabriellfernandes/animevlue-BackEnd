@@ -62,7 +62,7 @@ Press Ctrl+C to stop the server
 <a name="frontend"></a>
 
 ## 4. Front-End
-- <a name="Repositorio Front-End" href="https://github.com/gabriellfernandes/" target="_blank">Repositorio Front-End</a>
+- <a name="Repositorio Front-End" href="https://github.com/gabriellfernandes/animesvlue_front_end" target="_blank">Repositorio Front-End</a>
 
 <a name="devs"></a>
 
