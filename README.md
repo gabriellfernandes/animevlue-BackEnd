@@ -46,7 +46,7 @@ DATABASE_URL="mysql://usuario:senha@127.0.0.1:3306/animevlue_api?serverVersion=1
 
 ```
 
-2.2.6 - Para rodar projeto utilize o comando `symfony console server:start` ou caso não tenha o CLI do symfony use o comando `php bin/console server:start` no terminal, caso de tudo certo receberá uma mensagem parecida com essa:
+2.2.6 - Para rodar projeto utilize o comando `symfony server:start` ou caso não tenha o CLI do symfony use o comando `php -S localhost:8000 -t public/` no terminal, caso de tudo certo receberá uma mensagem parecida com essa:
 
 ```
 [OK] Web server listening
