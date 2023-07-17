@@ -49,8 +49,9 @@ DATABASE_URL="mysql://usuario:senha@127.0.0.1:3306/animevlue_api?serverVersion=1
 2.2.6 - Para rodar projeto utilize o comando `symfony console server:start` ou caso não tenha o CLI do symfony use o comando `php bin/console server:start` no terminal, caso de tudo certo receberá uma mensagem parecida com essa:
 
 ```
-INFO  Server running on http://localhost:8000
-Press Ctrl+C to stop the server
+[OK] Web server listening
+      The Web server is using PHP CGI 8.2.4
+      http://127.0.0.1:8000
 ```
 
 <a name="doc"></a>
