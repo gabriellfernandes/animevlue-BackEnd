@@ -17,7 +17,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user_show', 'comment_show', "favorite_show"])]
+    #[Groups(['user_show', 'comment_show', "favorite_show", 'anime_show_comments'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -34,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['user_show', 'comment_show', "favorite_show"])]
+    #[Groups(['user_show', 'comment_show', "favorite_show", 'anime_show_comments'])]
     private ?string $nickName = null;
 
     #[ORM\Column]

@@ -25,9 +25,7 @@ class FavoriteController extends AbstractController
     #[Route('/favorite', name: 'favorite_list', methods: ['GET'])]
     public function index(FavoriteRepository $favoriteRepository): JsonResponse
     {
-        return $this->json([
-            'data' => $favoriteRepository->findAll()
-        ], 200, [], ['groups' => "favorite_show"]);
+        return $this->json($favoriteRepository->findAll(), 200, [], ['groups' => "favorite_show"]);
     }
 
     #[Route('/favorite/user', name: 'favorite_listByUser', methods: ['GET'])]
@@ -51,9 +49,7 @@ class FavoriteController extends AbstractController
             ], 404);
         }
 
-        return $this->json([
-            'data' => $favorite
-        ], 200, [], ['groups' => "favorite_show"]);
+        return $this->json($favorite, 200, [], ['groups' => "favorite_show"]);
     }
 
     #[Route('/favorite/{id}', name: 'favorite_s', methods: ['GET'])]
@@ -67,9 +63,7 @@ class FavoriteController extends AbstractController
             ], 404);
         }
 
-        return $this->json([
-            'data' => $favorite
-        ], 200, [], ['groups' => "favorite_show"]);
+        return $this->json($favorite, 200, [], ['groups' => "favorite_show"]);
     }
 
 
@@ -91,6 +85,8 @@ class FavoriteController extends AbstractController
                 'message' => 'user not found!'
             ], 404);
         }
+        
+        if (!array_key_exists('anime_id', $data)) return $this->json(['message' => 'the anime_id field is missing'], 404);
 
         $anime = $animeRepository->findOneBy(['anime_id' => $data['anime_id']]);
         if (!$anime) {

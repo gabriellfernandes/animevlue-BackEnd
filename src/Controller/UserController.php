@@ -30,9 +30,7 @@ class UserController extends AbstractController
 
         $emailValidationResult = $this->middlewareEmail->validateEmailToken($authorizationHeader);
 
-        return $this->json([
-            'data' => $userRepository->findOneBy(['email' => $emailValidationResult['email']])
-        ], 200, [], ['groups' => 'user_show']);
+        return $this->json($userRepository->findOneBy(['email' => $emailValidationResult['email']]), 200, [], ['groups' => 'user_show']);
     }
 
     #[Route('/register', name: 'user_register', methods: ['POST'])]
@@ -43,6 +41,10 @@ class UserController extends AbstractController
         } else {
             $data = $request->request->all();
         }
+
+        if (!array_key_exists('username', $data)) return $this->json(['message' => 'the username field is missing'], 404);
+        if (!array_key_exists('email', $data)) return $this->json(['message' => 'the email field is missing'], 404);
+        if (!array_key_exists('password', $data)) return $this->json(['message' => 'the password field is missing'], 404);
 
         if ($userRepository->findOneBy(['email' => $data['email']])) {
             return $this->json([
@@ -62,7 +64,7 @@ class UserController extends AbstractController
 
         return $this->json([
             'message' => 'user created success!',
-            'data' =>  $user,
+            'data' => $user,
         ], 201, [],  ['groups' => 'user_show']);
     }
 
@@ -93,7 +95,7 @@ class UserController extends AbstractController
 
         return $this->json([
             'message' => 'user updated success!',
-            'data' =>  $user,
+            'data' => $user,
         ], 200, [], ['groups' => 'user_show']);
     }
 

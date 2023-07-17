@@ -13,11 +13,11 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["comment_show", "user_show"])]
+    #[Groups(["comment_show", "user_show", 'anime_show_comments'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["comment_show", "user_show"])]
+    #[Groups(["comment_show", "user_show", 'anime_show_comments'])]
     private ?string $comment = null;
 
     #[ORM\Column]
@@ -30,7 +30,7 @@ class Comment
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(["comment_show"])]
+    #[Groups(["comment_show", 'anime_show_comments'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]

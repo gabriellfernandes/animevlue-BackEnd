@@ -25,9 +25,7 @@ class CommentController extends AbstractController
     #[Route('/comments', name: 'comments_list', methods: ['GET'])]
     public function index(CommentRepository $commentRepository): JsonResponse
     {
-        return $this->json([
-            'data' => $commentRepository->findAll(),
-        ], 200, [], ['groups' => 'comment_show']);
+        return $this->json($commentRepository->findAll(), 200, [], ['groups' => 'comment_show']);
     }
 
     #[Route('/comments/{id}', name: 'comments_single', methods: ['GET'])]
@@ -42,9 +40,7 @@ class CommentController extends AbstractController
             ], 404, []);
         }
 
-        return $this->json([
-            'data' => $comment,
-        ], 200, [], ['groups' => 'comment_show']);
+        return $this->json($comment, 200, [], ['groups' => 'comment_show']);
     }
 
     #[Route('/comments', name: 'comments_create', methods: ['POST'])]
@@ -65,6 +61,9 @@ class CommentController extends AbstractController
             ], 404);
         }
 
+        if (!array_key_exists('anime_id', $data)) return $this->json(['message' => 'the anime_id field is missing'], 404);
+        if (!array_key_exists('comment', $data)) return $this->json(['message' => 'the comment field is missing'], 404);
+        
         $anime = $animeRepository->findOneBy(['anime_id' => $data['anime_id']]);
         if (!$anime) {
             return $this->json([

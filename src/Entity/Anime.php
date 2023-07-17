@@ -31,6 +31,7 @@ class Anime
     private ?string $image = null;
 
     #[ORM\OneToMany(mappedBy: 'anime', targetEntity: Comment::class, orphanRemoval: true)]
+    #[Groups(["anime_show_comments"])]
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'anime', targetEntity: Favorite::class)]

@@ -15,9 +15,7 @@ class AnimeController extends AbstractController
     #[Route('/anime', name: 'anime_list', methods: ["GET"])]
     public function index(AnimeRepository $animeRepository): JsonResponse
     {
-        return $this->json([
-            'data' => $animeRepository->findAll()
-        ], 200, [], ['groups' => 'anime_show']);
+        return $this->json($animeRepository->findAll(), 200, [], ['groups' => 'anime_show']);
     }
 
     #[Route('/anime/{id}', name: 'anime_single', methods: ["GET"])]
@@ -30,9 +28,7 @@ class AnimeController extends AbstractController
             ], 404);
         }
 
-        return $this->json([
-            'data' =>  $animeExists
-        ], 200, [], ['groups' => 'anime_show']);
+        return $this->json($animeExists, 200, [], ['groups' => 'anime_show']);
     }
 
 
@@ -46,9 +42,7 @@ class AnimeController extends AbstractController
             ], 404);
         }
 
-        return $this->json([
-            'data' =>  $animeExists
-        ], 200, [], ['groups' => 'anime_show']);
+        return $this->json($animeExists, 200, [], ['groups' => ['anime_show', 'anime_show_comments']]);
     }
 
     #[Route('/anime', name: 'anime_create', methods: ["POST"])]
@@ -66,6 +60,10 @@ class AnimeController extends AbstractController
                 'message' => 'anime already exists',
             ], 409);
         }
+
+        if (!array_key_exists('name', $data)) return $this->json(['message' => 'the name field is missing'], 404);
+        if (!array_key_exists('anime_id', $data)) return $this->json(['message' => 'the anime_id field is missing'], 404);
+        if (!array_key_exists('image', $data)) return $this->json(['message' => 'the image field is missing'], 404);
 
         $anime = new Anime();
         $anime->setName($data['name']);
